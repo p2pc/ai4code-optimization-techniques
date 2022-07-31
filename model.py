@@ -57,9 +57,12 @@ class MarkdownModelDistllBERT(nn.Module):
         #self.top = nn.Linear(769, 1)
 
     def forward(self, ids, mask, fts):
+        # Chạy quả model pretrain
         x = self.model(ids, mask)[0]
         x = torch.cat((x[:, 0, :], fts), 1)
         #x = self.top(x)
+
+        # Sử dụng một DNN để sinh ra kết quả
         x = self.net(x)
         return x
 

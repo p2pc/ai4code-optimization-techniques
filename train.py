@@ -13,6 +13,11 @@ import torch
 import argparse
 import bitsandbytes as bnb
 
+# shibing624/code-autocomplete-distilgpt2-python
+# microsoft/graphcodebert-base
+# microsoft/codebert-base
+# tals/roberta_python
+
 parser = argparse.ArgumentParser(description='Process some arguments')
 parser.add_argument('--model_name_or_path', type=str,
                     default='microsoft/graphcodebert-base')

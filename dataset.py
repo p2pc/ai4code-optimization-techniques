@@ -1,6 +1,6 @@
 from torch.utils.data import DataLoader, Dataset
 import torch
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, GPT2Tokenizer
 
 
 class MarkdownDataset(Dataset):
@@ -10,8 +10,18 @@ class MarkdownDataset(Dataset):
         self.df = df.reset_index(drop=True)
         self.md_max_len = md_max_len
         self.total_max_len = total_max_len  # maxlen allowed by model config
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name_or_path, use_fast=True)
+        # Sử dụng AutoTokenizer, optimize với fast tokenizer với option use_fast = True
+        #self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, use_fast=True)
+
+        # self.tokenizer AutoTokenizer.from_pretrained(model_name_or_path, use_fast=True)
+
+        # Sử dụng một tokenizer từ một model pretrain trước
+        self.tokenizer = AutoTokenizer.from_pretrained("tals/roberta_python")
+
+        # Nếu tokenizer chưa có pad_token, thêm vào
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+            
         self.fts = fts
 
     def __getitem__(self, index):
