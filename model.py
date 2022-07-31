@@ -5,6 +5,11 @@ from transformers import AutoModel, AutoTokenizer, AdamW, get_linear_schedule_wi
 
 
 class MarkdownModelCodeBERT(nn.Module):
+    """Mô hình sử dụng Code-Bert, GraphCodeBert pretrain
+
+    Args:
+        nn (_type_): _description_
+    """
     def __init__(self, model_path):
         super(MarkdownModelCodeBERT, self).__init__()
         self.model = AutoModel.from_pretrained(model_path)
@@ -30,6 +35,11 @@ class MarkdownModelCodeBERT(nn.Module):
 
 
 class MarkdownModelDistllBERT(nn.Module):
+    """Mô hình sử dụng Distill Bert pretrain
+
+    Args:
+        nn (_type_): _description_
+    """
     def __init__(self, model_path):
         super(MarkdownModelDistllBERT, self).__init__()
         self.model = AutoModel.from_pretrained(model_path)

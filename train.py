@@ -85,6 +85,7 @@ def validate(model, val_loader):
 
     return np.concatenate(labels), np.concatenate(preds)
 
+# Cài đặt bitsandbytes-cuda110, chọn version phù hợp
 #!pip install -q bitsandbytes-cuda110
 
 
@@ -106,7 +107,9 @@ def set_embedding_parameters_bits(embeddings_path, optim_bits=32):
 
 def train(model, train_loader, val_loader, epochs):
     np.random.seed(0)
+    # Định nghĩa max_norm mặc định 1.5
     max_norm = 1.5
+
     # Creating optimizer and lr schedulers
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
@@ -117,17 +120,23 @@ def train(model, train_loader, val_loader, epochs):
             nd in n for nd in no_decay)], 'weight_decay': 0.0}
     ]
 
+    # Sử dụng optimizer Adam 8bit
     optimizer = bnb.optim.Adam8bit(optimizer_grouped_parameters, lr=3e-5)
+
+    # Sử dựng optimizer AdamW 8bit
+    #optimizer = bnb.optim.AdamW8bit(optimizer_grouped_parameters, lr=3e-5)
+
+
     for module in model.modules():
         if isinstance(module, torch.nn.Embedding):
             bnb.optim.GlobalOptimManager.get_instance().register_module_override(
                 module, 'weight', {'optim_bits': 32}
             )
 
-    num_train_optimization_steps = int(
-        args.epochs * len(train_loader) / args.accumulation_steps)
+    num_train_optimization_steps = int(args.epochs * len(train_loader) / args.accumulation_steps)
     # optimizer = AdamW(optimizer_grouped_parameters, lr=3e-5,
-    #                   correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False
+    #                   correct_bias=False)
+    # To reproduce BertAdam specific behavior set correct_bias=False
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0.05 * num_train_optimization_steps,
                                                 num_training_steps=num_train_optimization_steps)  # PyTorch scheduler
 
